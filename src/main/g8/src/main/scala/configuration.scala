@@ -1,4 +1,3 @@
-//change name here
 package $name$
 
 import ohnosequences.statika._
@@ -37,7 +36,7 @@ case object configuration extends Configuration {
     accessKey = cred._1,
     secretKey = cred._2,
 
-    email = "museeer@gmail.com",
+    email = "$email$",
 
     managerConfig = ManagerConfig(
       instanceSpecs = specs
@@ -128,7 +127,7 @@ object nisperoCLI {
       case Some("prepare") => prep.prepareAccount()
       case Some("run")  => runManager()
       //case Some("deps") => println(ohnosequences.nispero.scriptexecutor.scriptexecutor.deps)
-      case _ => println("unknown command")
+      case _ => runManager()
     }
 
   }
