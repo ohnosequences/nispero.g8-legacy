@@ -14,7 +14,7 @@ object NisperoBuild extends Build {
 
     val lines = scala.io.Source.fromFile(new File(file("."), config)).getLines()
 
-    lines.find(_.matches("\\s*package.+")) match {
+    lines.find(_.matches("package.+")) match {
       case None => throw new Error("package isn't specified in " + config)
       case Some(s) => {
 
