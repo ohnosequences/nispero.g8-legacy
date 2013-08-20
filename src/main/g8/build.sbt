@@ -12,7 +12,7 @@ organization := "ohnosequences"
 
 isPrivate := true
 
-artifactsBucket := "$bucket$"
+//artifactsBucket := "$bucket$"
 
 buildInfoKeys <++= (s3credentials) {
     case Some(s3c) => Seq[BuildInfoKey]("credentials" -> s3c)
