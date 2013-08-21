@@ -13,6 +13,7 @@ import ohnosequences.nispero.Config
 import ohnosequences.nispero.ManagerConfig
 import ohnosequences.nispero.VisibilityTimeoutPolicy
 import ohnosequences.nispero.Resources
+import ohnosequences.awstools.s3.ObjectAddress
 
 case object configuration extends Configuration {
 
@@ -42,7 +43,7 @@ case object configuration extends Configuration {
       instanceSpecs = specs
     ),
 
-    initialTasks = None,
+    initialTasks = Some(ObjectAddress("team1-test-bucket", "tasksOldTeam1")),
 
     workersDir = ".",
 
@@ -75,7 +76,7 @@ case object configuration extends Configuration {
   }
 }
 
-case object worker extends Worker(configuration, ohnosequences.nispero.scriptexecutor.scriptexecutor) {
+case object worker extends Worker(configuration, $instructionsObject$) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
