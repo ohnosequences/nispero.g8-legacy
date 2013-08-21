@@ -3,7 +3,7 @@ package $name$
 import ohnosequences.statika._
 
 import ohnosequences.nispero._
-import ohnosequences.awstools.ec2.{InstanceType, InstanceSpecs}
+import ohnosequences.awstools.ec2.{Tag, InstanceType, InstanceSpecs}
 import ohnosequences.awstools.autoscaling.{LaunchConfiguration, AutoScalingGroup}
 import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration, metadataProvider}
 import ohnosequences.nispero.distributions.AMI44939930
@@ -82,7 +82,7 @@ case object resources extends ohnosequences.nispero.bundles.Resources(configurat
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object logUploader extends ohnosequences.nispero.bundles.LogUploader(configuration) {
+case object logUploader extends ohnosequences.nispero.bundles.LogUploader(resources, configuration) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
@@ -120,6 +120,9 @@ object nisperoCLI {
       val specs = configuration.specs.copy(userData = us)
 
       val instance = awsClients.ec2.runInstances(1, specs).headOption
+
+      instance.foreach(_.createTag(Tag(InstanceTags.STATUS_TAG_NAME, "manager"))
+
       println("manager run at " + instance.map(_.getInstanceId()))
      }
 
