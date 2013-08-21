@@ -102,7 +102,7 @@ object nisperoCLI {
   def runManager() {
     logger.info("setup AWS account")
 
-    //if(prep.prepareAccount()) {
+    if(prep.prepareAccount()) {
 
       logger.info("adding initial tasks")
       configuration.config.initialTasks.foreach(Utils.addInitialTasks(awsClients, _, configuration.config.resources.inputQueue))
@@ -114,7 +114,7 @@ object nisperoCLI {
 
       val instance = awsClients.ec2.runInstances(1, specs).headOption
       println("manager run at " + instance.map(_.getInstanceId()))
-    //}
+     }
 
   }
 
