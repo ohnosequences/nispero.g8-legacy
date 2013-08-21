@@ -76,9 +76,7 @@ case object configuration extends Configuration {
   }
 }
 
-case object worker extends Worker(configuration, $instructionsObject$) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+
 
 case object resources extends ohnosequences.nispero.bundles.Resources(configuration) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
@@ -88,7 +86,11 @@ case object logUploader extends ohnosequences.nispero.bundles.LogUploader(config
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object manager extends ohnosequences.nispero.bundles.Manager(configuration, resources, worker, AMI44939930) {
+case object worker extends Worker(configuration, $instructionsObject$, resources, logUploader) {
+  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+}
+
+case object manager extends ohnosequences.nispero.bundles.Manager(configuration, resources, logUploader, worker, AMI44939930) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
