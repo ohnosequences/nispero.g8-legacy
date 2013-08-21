@@ -124,7 +124,7 @@ object nisperoCLI {
       instance.foreach(_.createTag(Tag(InstanceTags.STATUS_TAG_NAME, "manager"))
 
       println("manager run at " + instance.map(_.getInstanceId()))
-     }
+
 
   }
 
