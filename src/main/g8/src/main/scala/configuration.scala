@@ -121,10 +121,10 @@ object nisperoCLI {
 
       val instance = awsClients.ec2.runInstances(1, specs).headOption
 
-      instance.foreach(_.createTag(Tag(InstanceTags.STATUS_TAG_NAME, "manager"))
+      instance.foreach(_.createTag(Tag(InstanceTags.STATUS_TAG_NAME, "manager")))
 
       println("manager run at " + instance.map(_.getInstanceId()))
-
+    }
 
   }
 
