@@ -111,6 +111,17 @@ object nisperoCLI {
 
     if(prep.prepareAccount()) {
 
+      val config = configuration.config
+
+      logger.info("creating notification topic: " + config.resources.notificationTopic)
+      val topic = awsClients.sns.createTopic(config.resources.notificationTopic)
+
+      if (!topic.isEmailSubscribed(config.email)) {
+        logger.info("subscribing " + config.email + " to notification topic")
+        topic.subscribeEmail(config.email)
+        logger.info("please confirm subscription")
+      }
+
       logger.info("adding initial tasks")
       configuration.config.initialTasks.foreach(Utils.addInitialTasks(awsClients, _, configuration.config.resources.inputQueue))
 
@@ -124,6 +135,8 @@ object nisperoCLI {
       instance.foreach(_.createTag(Tag(InstanceTags.STATUS_TAG_NAME, "manager")))
 
       println("manager run at " + instance.map(_.getInstanceId()))
+
+
     }
 
   }
