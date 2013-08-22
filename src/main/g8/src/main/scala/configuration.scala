@@ -71,9 +71,21 @@ case object configuration extends Configuration {
     )
   )
 
-  override def install[D <: DistributionAux](distribution: D): InstallResults = {
-    success("configuration finished")
-  }
+}
+
+case object instructions extends ohnosequences.nispero.bundles.ScriptExecutor() {
+  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+
+  val script =
+"""
+cp input/input1 output/output1
+echo "success" > message
+"""
+
+  val configure =
+"""
+echo "configuring"
+"""
 }
 
 
@@ -86,7 +98,7 @@ case object logUploader extends ohnosequences.nispero.bundles.LogUploader(resour
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object worker extends Worker(configuration, $instructionsObject$, resources, logUploader) {
+case object worker extends Worker(configuration, instructions, resources, logUploader) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
@@ -150,7 +162,6 @@ object nisperoCLI {
     args.headOption match {
       case Some("prepare") => prep.prepareAccount()
       case Some("run")  => runManager()
-      //case Some("deps") => println(ohnosequences.nispero.scriptexecutor.scriptexecutor.deps)
       case _ => runManager()
     }
 
