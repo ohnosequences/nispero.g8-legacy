@@ -140,7 +140,7 @@ object nisperoCLI {
       logger.info("generating userScript for manager")
       val us = nisperoDistribution.userScript(manager, Left(configuration.cred))
 
-      val specs = configuration.specs.copy(userData = us)
+      val specs = configuration.config.managerConfig.instanceSpecs.copy(userData = us)
 
       val instance = awsClients.ec2.runInstances(1, specs).headOption
 
