@@ -65,4 +65,4 @@ nextVersion := { ver => Version(ver).map(_.bumpMinor.string).getOrElse(versionFo
 
 addCommandAlias("nispero-publish", ";reload;release with-defaults") 
 
-addCommandAlias("nispero-run", ";reload;run run") 
+addCommandAlias("nispero-run", ";reload;publish;run run")
