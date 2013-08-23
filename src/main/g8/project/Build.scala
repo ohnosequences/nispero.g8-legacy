@@ -29,7 +29,7 @@ object NisperoBuild extends Build {
   lazy val configurationPackage = SettingKey[String]("configuration-package", "configuration-package")
 
   lazy val awsScalaTools = Project(
-    id = getConfigurationPackage(),
+    id = getConfigurationPackage().replace(".", ""),
     base = file("."),
     settings = Defaults.defaultSettings ++ releaseSettings ++ Seq(
       configurationPackage := getConfigurationPackage()
