@@ -19,7 +19,7 @@ case object configuration extends Configuration {
 
   val metadata = meta.configuration
 
-  val version = metadata.version.replace(".", "")
+  val version = metadata.name.replace(".", "").toLowerCase + metadata.version.replace(".", "")
 
   val cred = meta.configuration.credentials
 
