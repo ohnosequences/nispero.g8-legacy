@@ -32,6 +32,7 @@ publishTo <<= (isSnapshot, s3credentials, artifactsBucket) {
 }
 
 
+
 statikaPrivateResolvers <<= (artifactsBucket) { bucket =>
   Seq(
     ("s3://private.releases." + bucket)  at s3("s3://private.releases." + bucket),

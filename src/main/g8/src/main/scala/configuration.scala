@@ -49,16 +49,16 @@ case object configuration extends Configuration {
     ),
 
     resources = Resources(
-      id = version
+      id = nisperoInstanceId
     )(
       workersGroup = AutoScalingGroup(
-        name = "nisperoWorkersGroup" + version,
+        name = "nisperoWorkersGroup" + nisperoInstanceId,
         minSize = 1,
         maxSize = 2,
         desiredCapacity = 1,
 
         launchingConfiguration = LaunchConfiguration(
-          name = "nisperoLaunchConfiguration" + version,
+          name = "nisperoLaunchConfiguration" + nisperoInstanceId,
           spotPrice = awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001,
           instanceSpecs = specs
         )
@@ -108,18 +108,21 @@ case object nisperoDistribution extends NisperoDistribution(manager, worker, AMI
 
 object nisperoCLI {
 
-  val prep = new AccountPrepare(configuration.config, configuration.metadata.artifactsBucket)
-
-  val awsClients: AWSClients = AWSClients.fromCredentials(configuration.config.accessKey, configuration.config.secretKey)
   val logger = Logger(this.getClass)
 
+
   def runManager() {
+
+
     logger.info("setup AWS account")
 
+    val config = configuration.config
+
+    val awsClients: AWSClients = AWSClients.fromCredentials(config.accessKey, config.secretKey)
+
+    val prep = new AccountPrepare(configuration.config, configuration.metadata.artifactsBucket)
+
     if(prep.prepareAccount()) {
-
-      val config = configuration.config
-
 
 
       logger.info("creating notification topic: " + config.resources.notificationTopic)
