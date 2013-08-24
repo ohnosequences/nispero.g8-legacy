@@ -12,16 +12,17 @@ import ohnosequences.awstools.s3.ObjectAddress
 
 case object configuration extends Configuration {
 
-  val nisperoInstanceId = generateId()
-
   val metadata = meta.configuration
+
+  //ide of nispero instance
+  val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "").toLowerCase
 
   val cred = meta.configuration.credentials
 
   val awsClients: AWSClients = AWSClients.fromCredentials(cred._1, cred._2)
 
   val specs = InstanceSpecs(
-    instanceType = InstanceType.M1Medium,
+    instanceType = InstanceType.C1Medium,
     amiId = AMI44939930.id,
     securityGroups = List("nispero"),
     keyName = "nispero"
@@ -140,7 +141,7 @@ object nisperoCLI {
       logger.info("generating userScript for manager")
       val us = nisperoDistribution.userScript(manager, Explicit(config.accessKey, config.secretKey))
 
-      val specs = configuration.specs.copy(userData = us)
+      val specs = config.managerConfig.instanceSpecs.copy(userData = us)
 
       val instance = awsClients.ec2.runInstances(1, specs).headOption
 
@@ -156,11 +157,11 @@ object nisperoCLI {
   def main(args: Array[String]) {
 
     def test() {
+     //compiler check
      val result = manager.installWithDeps(worker, true)
     }
 
     args.headOption match {
-      case Some("prepare") => prep.prepareAccount()
       case Some("run")  => runManager()
       case _ => runManager()
     }

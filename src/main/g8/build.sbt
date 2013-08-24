@@ -31,6 +31,7 @@ publishTo <<= (isSnapshot, s3credentials, artifactsBucket) {
   credentials map s3resolver("My "+prefix+" S3 bucket", "s3://"+prefix+"." + bucket, Resolver.localBasePattern)
 }
 
+statikaVersion := "0.13.0"
 
 
 statikaPrivateResolvers <<= (artifactsBucket) { bucket =>
