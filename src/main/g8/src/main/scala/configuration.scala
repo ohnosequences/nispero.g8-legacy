@@ -17,6 +17,7 @@ case object configuration extends Configuration {
   //id of nispero instance
   val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "").toLowerCase
 
+
   val cred = meta.configuration.credentials
 
   val awsClients: AWSClients = AWSClients.fromCredentials(cred._1, cred._2)
@@ -141,7 +142,8 @@ object nisperoCLI {
       logger.info("generating userScript for manager")
       val us = nisperoDistribution.userScript(manager, Explicit(config.accessKey, config.secretKey))
 
-      val specs = config.managerConfig.instanceSpecs.copy(userData = us)
+
+      val specs = configuration.config.managerConfig.instanceSpecs.copy(userData = us)
 
       val instance = awsClients.ec2.runInstances(1, specs).headOption
 
