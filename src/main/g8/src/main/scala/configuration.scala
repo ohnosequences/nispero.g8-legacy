@@ -8,25 +8,20 @@ import ohnosequences.awstools.autoscaling.{LaunchConfiguration, AutoScalingGroup
 import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration, metadataProvider}
 import ohnosequences.nispero.distributions.AMI44939930
 import org.clapper.avsl.Logger
-import ohnosequences.nispero.TerminationConditions
-import ohnosequences.nispero.Config
-import ohnosequences.nispero.ManagerConfig
-import ohnosequences.nispero.VisibilityTimeoutPolicy
-import ohnosequences.nispero.Resources
 import ohnosequences.awstools.s3.ObjectAddress
 
 case object configuration extends Configuration {
 
-  val metadata = meta.configuration
+  val nisperoInstanceId = generateId()
 
-  val version = metadata.version.replace(".", "")
+  val metadata = meta.configuration
 
   val cred = meta.configuration.credentials
 
   val awsClients: AWSClients = AWSClients.fromCredentials(cred._1, cred._2)
 
   val specs = InstanceSpecs(
-    instanceType = InstanceType.C1Medium,
+    instanceType = InstanceType.M1Medium,
     amiId = AMI44939930.id,
     securityGroups = List("nispero"),
     keyName = "nispero"
@@ -40,7 +35,7 @@ case object configuration extends Configuration {
     email = "$email$",
 
     managerConfig = ManagerConfig(
-      instanceSpecs = specs
+      instanceSpecs = specs.copy(instanceType = InstanceType.C1Medium)
     ),
 
     initialTasks = Some(ObjectAddress("team1-test-bucket", "tasksOldTeam1")),
@@ -125,6 +120,8 @@ object nisperoCLI {
 
       val config = configuration.config
 
+
+
       logger.info("creating notification topic: " + config.resources.notificationTopic)
       val topic = awsClients.sns.createTopic(config.resources.notificationTopic)
 
@@ -138,7 +135,7 @@ object nisperoCLI {
       configuration.config.initialTasks.foreach(Utils.addInitialTasks(awsClients, _, configuration.config.resources.inputQueue))
 
       logger.info("generating userScript for manager")
-      val us = nisperoDistribution.userScript(manager, Left(configuration.cred))
+      val us = nisperoDistribution.userScript(manager, Explicit(config.accessKey, config.secretKey))
 
       val specs = configuration.specs.copy(userData = us)
 
