@@ -20,7 +20,7 @@ buildInfoKeys <++= (s3credentials) {
 }
 
 buildInfoKeys <++= (artifactsBucket) {
-    case bucket => Seq[BuildInfoKey]("artifactsBucket" -> bucket)
+    case bucket => Seq[BuildInfoKey]("artifactsBucket" -> bucket, "instanceProfileARN" -> None)
 }
 
 publishMavenStyle := false
