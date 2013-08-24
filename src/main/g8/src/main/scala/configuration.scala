@@ -39,7 +39,7 @@ case object configuration extends Configuration {
       instanceSpecs = specs.copy(instanceType = InstanceType.C1Medium)
     ),
 
-    initialTasks = Some(ObjectAddress("team1-test-bucket", "tasksOldTeam1")),
+    initialTasks = Some(ObjectAddress("team1-test-bucket", "tasksTeam1")),
 
     workersDir = ".",
 
@@ -50,16 +50,16 @@ case object configuration extends Configuration {
     ),
 
     resources = Resources(
-      id = nisperoInstanceId
+      id = version
     )(
       workersGroup = AutoScalingGroup(
-        name = "nisperoWorkersGroup" + nisperoInstanceId,
+        name = "nisperoWorkersGroup" + version,
         minSize = 1,
         maxSize = 2,
         desiredCapacity = 1,
 
         launchingConfiguration = LaunchConfiguration(
-          name = "nisperoLaunchConfiguration" + nisperoInstanceId,
+          name = "nisperoLaunchConfiguration" + version,
           spotPrice = awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001,
           instanceSpecs = specs
         )
