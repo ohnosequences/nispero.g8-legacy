@@ -14,7 +14,7 @@ case object configuration extends Configuration {
 
   val metadata = meta.configuration
 
-  //ide of nispero instance
+  //id of nispero instance
   val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "").toLowerCase
 
   val cred = meta.configuration.credentials
