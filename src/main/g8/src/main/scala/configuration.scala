@@ -3,12 +3,14 @@ package $name$
 import ohnosequences.statika._
 
 import ohnosequences.nispero._
-import ohnosequences.awstools.ec2.{Tag, InstanceType, InstanceSpecs}
-import ohnosequences.awstools.autoscaling.{LaunchConfiguration, AutoScalingGroup}
+import ohnosequences.awstools.ec2.{InstanceType, InstanceSpecs}
 import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration, metadataProvider}
 import ohnosequences.nispero.distributions.AMI44939930
-import org.clapper.avsl.Logger
-import ohnosequences.awstools.s3.ObjectAddress
+import ohnosequences.nispero.manager.{WorkersAutoScalingGroup, ManagerAutoScalingGroup}
+
+case object nispero {
+
+}
 
 case object configuration extends Configuration {
 
@@ -37,10 +39,11 @@ case object configuration extends Configuration {
     email = "$email$",
 
     managerConfig = ManagerConfig(
-      instanceSpecs = specs.copy(instanceType = InstanceType.C1Medium)
+      managerGroup = ManagerAutoScalingGroup(
+        instanceSpecs = specs.copy(instanceType = InstanceType.C1Medium),
+        version = version
+      )
     ),
-
-    initialTasks = Some(ObjectAddress("team1-test-bucket", "tasksTeam1")),
 
     workersDir = ".",
 
@@ -53,17 +56,10 @@ case object configuration extends Configuration {
     resources = Resources(
       id = version
     )(
-      workersGroup = AutoScalingGroup(
-        name = "nisperoWorkersGroup" + version,
-        minSize = 1,
-        maxSize = 2,
-        desiredCapacity = 1,
-
-        launchingConfiguration = LaunchConfiguration(
-          name = "nisperoLaunchConfiguration" + version,
-          spotPrice = awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001,
-          instanceSpecs = specs
-        )
+      workersGroup = WorkersAutoScalingGroup(
+        version = version,
+        instanceSpecs = specs,
+        spotPrice = Some(awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001)
       )
     )
   )
@@ -110,62 +106,24 @@ case object nisperoDistribution extends NisperoDistribution(manager, worker, AMI
 
 object nisperoCLI {
 
-  val logger = Logger(this.getClass)
-
-
-  def runManager() {
-
-
-    logger.info("setup AWS account")
-
-    val config = configuration.config
-
-    val awsClients: AWSClients = AWSClients.fromCredentials(config.accessKey, config.secretKey)
-
-    val prep = new AccountPrepare(configuration.config, configuration.metadata.artifactsBucket)
-
-    if(prep.prepareAccount()) {
-
-
-      logger.info("creating notification topic: " + config.resources.notificationTopic)
-      val topic = awsClients.sns.createTopic(config.resources.notificationTopic)
-
-      if (!topic.isEmailSubscribed(config.email)) {
-        logger.info("subscribing " + config.email + " to notification topic")
-        topic.subscribeEmail(config.email)
-        logger.info("please confirm subscription")
-      }
-
-      logger.info("adding initial tasks")
-      configuration.config.initialTasks.foreach(Utils.addInitialTasks(awsClients, _, configuration.config.resources.inputQueue))
-
-      logger.info("generating userScript for manager")
-      val us = nisperoDistribution.userScript(manager, Explicit(config.accessKey, config.secretKey))
-
-
-      val specs = configuration.config.managerConfig.instanceSpecs.copy(userData = us)
-
-      val instance = awsClients.ec2.runInstances(1, specs).headOption
-
-      instance.foreach(_.createTag(Tag(InstanceTags.STATUS_TAG_NAME, "manager")))
-
-      println("manager run at " + instance.map(_.getInstanceId()))
-
-
-    }
-
-  }
 
   def main(args: Array[String]) {
+
+    val nisperoRunner = new NisperoRunner(nisperoDistribution, configuration.config, configuration.metadata.artifactsBucket, tasksProvider)
 
     def test() {
      //compiler check
      val result = manager.installWithDeps(worker, true)
     }
 
+
+    val tasksProvider = EmptyTasks
+
     args.headOption match {
-      case Some("run")  => runManager()
-      case _ => runManager()
+      case Some("run")  => {
+        nisperoRunner.run()
+      }
+      case _ =>  nisperoRunner.run()
     }
 
   }
