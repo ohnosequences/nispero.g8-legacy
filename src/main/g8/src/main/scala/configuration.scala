@@ -8,6 +8,8 @@ import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration
 import ohnosequences.nispero.distributions.AMI44939930
 import ohnosequences.nispero.manager.{WorkersAutoScalingGroup, ManagerAutoScalingGroup}
 
+import java.io.File
+
 
 case object configuration extends Configuration {
 
