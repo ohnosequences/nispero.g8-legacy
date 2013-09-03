@@ -8,9 +8,6 @@ import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration
 import ohnosequences.nispero.distributions.AMI44939930
 import ohnosequences.nispero.manager.{WorkersAutoScalingGroup, ManagerAutoScalingGroup}
 
-case object nispero {
-
-}
 
 case object configuration extends Configuration {
 
@@ -19,13 +16,12 @@ case object configuration extends Configuration {
   //id of nispero instance
   val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "").toLowerCase
 
-
   val cred = meta.configuration.credentials
 
   val awsClients: AWSClients = AWSClients.fromCredentials(cred._1, cred._2)
 
   val specs = InstanceSpecs(
-    instanceType = InstanceType.C1Medium,
+    instanceType = InstanceType.M1Medium,
     amiId = AMI44939930.id,
     securityGroups = List("nispero"),
     keyName = "nispero"
@@ -57,6 +53,7 @@ case object configuration extends Configuration {
       id = version
     )(
       workersGroup = WorkersAutoScalingGroup(
+        desiredCapacity = 1,
         version = version,
         instanceSpecs = specs,
         spotPrice = Some(awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001)
@@ -106,18 +103,10 @@ case object nisperoDistribution extends NisperoDistribution(manager, worker, AMI
 
 object nisperoCLI {
 
-
   def main(args: Array[String]) {
 
+    val tasksProvider = new FileTasks(new File("tasks"))
     val nisperoRunner = new NisperoRunner(nisperoDistribution, configuration.config, configuration.metadata.artifactsBucket, tasksProvider)
-
-    def test() {
-     //compiler check
-     val result = manager.installWithDeps(worker, true)
-    }
-
-
-    val tasksProvider = EmptyTasks
 
     args.headOption match {
       case Some("run")  => {
@@ -125,7 +114,11 @@ object nisperoCLI {
       }
       case _ =>  nisperoRunner.run()
     }
-
   }
 
+  //compiler check
+  def test() {
+    val result = manager.installWithDeps(worker, true)
+  }
 }
+
