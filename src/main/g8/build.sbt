@@ -44,7 +44,7 @@ statikaPrivateResolvers <<= (artifactsBucket) { bucket =>
 
 
 libraryDependencies ++= Seq(
-	"ohnosequences" % "nispero-abstract_2.10" % "0.0.8"
+	"ohnosequences" % "nispero-abstract_2.10" % "0.0.9"
 )
 
 bundlePackage <<= configurationPackage
