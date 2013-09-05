@@ -40,7 +40,8 @@ case object configuration extends Configuration {
       managerGroup = ManagerAutoScalingGroup(
         instanceSpecs = specs.copy(instanceType = InstanceType.C1Medium),
         version = version
-      )
+      ),
+      password = metadata.password
     ),
 
     tasksProvider = EmptyTasks,

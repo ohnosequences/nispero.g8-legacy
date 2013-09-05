@@ -20,7 +20,11 @@ buildInfoKeys <++= (s3credentials) {
 }
 
 buildInfoKeys <++= (artifactsBucket) {
-    case bucket => Seq[BuildInfoKey]("artifactsBucket" -> bucket, "instanceProfileARN" -> None)
+    case bucket => Seq[BuildInfoKey](
+        "artifactsBucket" -> bucket,
+        "instanceProfileARN" -> None,
+        "password" -> math.random.hashCode.toString
+    )
 }
 
 publishMavenStyle := false
@@ -44,7 +48,7 @@ statikaPrivateResolvers <<= (artifactsBucket) { bucket =>
 
 
 libraryDependencies ++= Seq(
-	"ohnosequences" % "nispero-abstract_2.10" % "0.0.9"
+	"ohnosequences" % "nispero-abstract_2.10" % "0.1.0-SNAPSHOT"
 )
 
 bundlePackage <<= configurationPackage
