@@ -46,7 +46,7 @@ case object configuration extends Configuration {
 
     tasksProvider = EmptyTasks,
 
-    workersDir = ".",
+    workersDir =  "/media/ephemeral0",
 
     visibilityTimeoutPolicy = VisibilityTimeoutPolicy(),
 
@@ -60,7 +60,9 @@ case object configuration extends Configuration {
       workersGroup = WorkersAutoScalingGroup(
         desiredCapacity = 1,
         version = version,
-        instanceSpecs = specs,
+        instanceSpecs = specs.copy(
+          deviceMapping = Map("/dev/xvdb" -> "ephemeral0")
+        ),
         spotPrice = Some(awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001)
       )
     )
