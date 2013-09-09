@@ -100,11 +100,11 @@ case object worker extends Worker(configuration, instructions, resources, logUpl
 }
 
 case object manager extends ohnosequences.nispero.bundles.Manager(configuration, resources, logUploader, worker, AMI44939930) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+  val metadata = metadataProvider.generateAWSMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
 case object nisperoDistribution extends NisperoDistribution(manager, worker, AMI44939930) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+  val metadata = metadataProvider.generateAWSMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
 
