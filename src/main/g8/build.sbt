@@ -23,7 +23,7 @@ buildInfoKeys <++= (artifactsBucket) {
     case bucket => Seq[BuildInfoKey](
         "artifactsBucket" -> bucket,
         "instanceProfileARN" -> None,
-        "password" -> math.random.hashCode.toString
+        "password" -> math.random.hashCode.abs.toString
     )
 }
 
