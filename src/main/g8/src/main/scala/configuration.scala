@@ -46,7 +46,7 @@ case object configuration extends Configuration {
 
     tasksProvider = EmptyTasks,
 
-    workersDir = ".",
+    workersDir =  "/media/ephemeral0",
 
     visibilityTimeoutPolicy = VisibilityTimeoutPolicy(),
 
@@ -60,7 +60,9 @@ case object configuration extends Configuration {
       workersGroup = WorkersAutoScalingGroup(
         desiredCapacity = 1,
         version = version,
-        instanceSpecs = specs,
+        instanceSpecs = specs.copy(
+          deviceMapping = Map("/dev/xvdb" -> "ephemeral0")
+        ),
         spotPrice = Some(awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001)
       )
     )
@@ -110,7 +112,8 @@ object nisperoCLI {
 
   def main(args: Array[String]) {
 
-    //val tasksProvider = new FileTasks(new File("tasks"))
+    val s3 = ohnosequences.awstools.s3.S3.create(configuration.cred._1, configuration.cred._2)
+    s3.createBucket(configuration.config.resources.bucket)
     val nisperoRunner = new NisperoRunner(nisperoDistribution, configuration.config, configuration.metadata.artifactsBucket)
 
     args.headOption match {
