@@ -15,9 +15,19 @@ isPrivate := true
 //artifactsBucket := "$bucket$"
 
 buildInfoKeys <++= (s3credentials) {
-    case Some(s3c) => Seq[BuildInfoKey]("credentials" -> s3c)
-    case None => throw new Error("s3credentials isn't set!")
+    case s3cred => Seq[BuildInfoKey]("credentials" -> s3cred)
 }
+
+
+//buildInfoKeys <++= (s3credentials) {
+//    case Some(s3c) => Seq[BuildInfoKey]("credentials" -> s3c)
+//    case None => throw new Error("s3credentials isn't set!")
+//}
+
+buildInfoObjectFormat <<= (bundlePackage, bundleObject) { (bp, bo) =>
+  "object %s extends ohnosequences.statika.MetadataOf["+bp+"."+bo+".type]"
+}
+
 
 buildInfoKeys <++= (artifactsBucket) {
     case bucket => Seq[BuildInfoKey](

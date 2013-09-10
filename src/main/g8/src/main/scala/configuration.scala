@@ -18,21 +18,16 @@ case object configuration extends Configuration {
   //id of nispero instance
   val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "").toLowerCase
 
-  val cred = meta.configuration.credentials
-
-  //val awsClients: AWSClients = AWSClients.fromCredentials(cred._1, cred._2)
-  val ec2 = EC2.create(cred._1, cred._2)
-
   val specs = InstanceSpecs(
     instanceType = InstanceType.M1Medium,
     amiId = AMI44939930.id,
     securityGroups = List("nispero"),
-    keyName = "nispero"
+    keyName = "nispero",
+    instanceProfile = Some("nispero")
+
   )
 
   val config = Config(
-
-    credentials = Some(cred),
 
     email = "$email$",
 
@@ -62,8 +57,7 @@ case object configuration extends Configuration {
         version = version,
         instanceSpecs = specs.copy(
           deviceMapping = Map("/dev/xvdb" -> "ephemeral0")
-        ),
-        spotPrice = Some(ec2.getCurrentSpotPrice(specs.instanceType) + 0.001)
+        )
       )
     )
   )
@@ -87,19 +81,23 @@ echo "configuring"
 
 
 
-case object resources extends ohnosequences.nispero.bundles.Resources(configuration) {
+case object aws extends ohnosequences.nispero.bundles.AWS(configuration) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object logUploader extends ohnosequences.nispero.bundles.LogUploader(resources, configuration) {
+case object resources extends ohnosequences.nispero.bundles.Resources(configuration, aws) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object worker extends Worker(configuration, instructions, resources, logUploader) {
+case object logUploader extends ohnosequences.nispero.bundles.LogUploader(resources, aws) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object manager extends ohnosequences.nispero.bundles.Manager(configuration, resources, logUploader, worker, AMI44939930) {
+case object worker extends Worker(configuration, instructions, resources, logUploader, aws) {
+  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+}
+
+case object manager extends ohnosequences.nispero.bundles.Manager(configuration, resources, logUploader, worker, AMI44939930, aws) {
   val metadata = metadataProvider.generateAWSMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
@@ -112,8 +110,7 @@ object nisperoCLI {
 
   def main(args: Array[String]) {
 
-    //val tasksProvider = new FileTasks(new File("tasks"))
-    val nisperoRunner = new NisperoRunner(nisperoDistribution, configuration.config, configuration.metadata.artifactsBucket)
+    val nisperoRunner = new NisperoRunner(nisperoDistribution, configuration.config, configuration.metadata.credentials)
 
     args.headOption match {
       case Some("run")  => {
