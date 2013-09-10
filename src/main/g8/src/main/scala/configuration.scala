@@ -3,7 +3,7 @@ package $name$
 import ohnosequences.statika._
 
 import ohnosequences.nispero._
-import ohnosequences.awstools.ec2.{InstanceType, InstanceSpecs}
+import ohnosequences.awstools.ec2.{EC2, InstanceType, InstanceSpecs}
 import ohnosequences.awstools.s3.ObjectAddress
 import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration, metadataProvider}
 import ohnosequences.nispero.distributions.AMI44939930
@@ -20,7 +20,8 @@ case object configuration extends Configuration {
 
   val cred = meta.configuration.credentials
 
-  val awsClients: AWSClients = AWSClients.fromCredentials(cred._1, cred._2)
+  //val awsClients: AWSClients = AWSClients.fromCredentials(cred._1, cred._2)
+  val ec2 = EC2.create(cred._1, cred._2)
 
   val specs = InstanceSpecs(
     instanceType = InstanceType.M1Medium,
@@ -31,8 +32,7 @@ case object configuration extends Configuration {
 
   val config = Config(
 
-    accessKey = cred._1,
-    secretKey = cred._2,
+    credentials = Some(cred),
 
     email = "$email$",
 
@@ -63,7 +63,7 @@ case object configuration extends Configuration {
         instanceSpecs = specs.copy(
           deviceMapping = Map("/dev/xvdb" -> "ephemeral0")
         ),
-        spotPrice = Some(awsClients.ec2.getCurrentSpotPrice(specs.instanceType) + 0.001)
+        spotPrice = Some(ec2.getCurrentSpotPrice(specs.instanceType) + 0.001)
       )
     )
   )
