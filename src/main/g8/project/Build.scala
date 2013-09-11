@@ -24,7 +24,7 @@ object NisperoBuild extends Build {
 
   }
 
-  //lazy val artifactsBucket = SettingKey[String]("artifacts-bucket", "bucket for releases")
+  lazy val artifactsBucketsSuffix = SettingKey[String]("artifacts-buckets-suffix", "suffix of buckets for artifacts")
 
   lazy val configurationPackage = SettingKey[String]("configuration-package", "configuration-package")
 
