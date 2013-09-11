@@ -4,7 +4,7 @@ import ReleasePlugin._
 import ReleaseKeys._
 import NisperoBuild._
 
-name := "w"
+name := "$name$"
 
 description := ""
 
@@ -12,24 +12,15 @@ organization := "ohnosequences"
 
 isPrivate := true
 
-//artifactsBucket := "frutero.org"
+artifactsBucketsSuffix := "$bucketsSuffix$"
 
-buildInfoKeys <++= (s3credentials) {
-    case s3cred => Seq[BuildInfoKey]("credentials" -> s3cred)
-}
-
-
-//buildInfoKeys <++= (s3credentials) {
-//    case Some(s3c) => Seq[BuildInfoKey]("credentials" -> s3c)
-//    case None => throw new Error("s3credentials isn't set!")
-//}
+//buildInfoKeys ++= Seq[BuildInfoKey]("credentials" -> Some("$resolver-accessKey$" -> "$resolver-secretKey$"))
 
 buildInfoObjectFormat <<= (bundlePackage, bundleObject) { (bp, bo) =>
   "object %s extends ohnosequences.statika.MetadataOf["+bp+"."+bo+".type]"
 }
 
-
-buildInfoKeys <++= (artifactsBucket) {
+buildInfoKeys <++= (artifactsBucketsSuffix) {
     case bucket => Seq[BuildInfoKey](
         "artifactsBucket" -> bucket,
         "instanceProfileARN" -> None,
@@ -39,16 +30,16 @@ buildInfoKeys <++= (artifactsBucket) {
 
 publishMavenStyle := false
 
-publishTo <<= (isSnapshot, s3credentials, artifactsBucket) {
-                (snapshot,   credentials, bucket) =>
+publishTo <<= (isSnapshot, artifactsBucketsSuffix) {
+                (snapshot, bucket) =>
   val prefix = "private." + (if (snapshot) "snapshots" else "releases")
-  credentials map s3resolver("My "+prefix+" S3 bucket", "s3://"+prefix+"." + bucket, Resolver.localBasePattern)
+  Some("$resolver-accessKey$" -> "$resolver-secretKey$") map s3resolver("My "+prefix+" S3 bucket", "s3://"+prefix+"." + bucket, Resolver.localBasePattern)
 }
 
 statikaVersion := "0.14.0"
 
 
-statikaPrivateResolvers <<= (artifactsBucket) { bucket =>
+statikaPrivateResolvers <<= (artifactsBucketsSuffix) { bucket =>
   Seq(
     ("s3://private.releases." + bucket)  at s3("s3://private.releases." + bucket),
     ("s3://private.snapshots." + bucket) at s3("s3://private.snapshots." + bucket)
@@ -56,14 +47,14 @@ statikaPrivateResolvers <<= (artifactsBucket) { bucket =>
 }
 
 
-
 libraryDependencies ++= Seq(
-	"ohnosequences" % "nispero-abstract_2.10" % "0.1.2-SNAPSHOT"
+  "ohnosequences" % "nispero-abstract_2.10" % "0.1.2"
 )
 
 bundlePackage <<= configurationPackage
 
 bundleObject := "configuration"
+
 
 // sbt-release settings
 
