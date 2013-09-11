@@ -80,7 +80,6 @@ echo "configuring"
 }
 
 
-
 case object aws extends ohnosequences.nispero.bundles.AWS(configuration) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
@@ -109,15 +108,7 @@ case object nisperoDistribution extends NisperoDistribution(manager, worker, AMI
 object nisperoCLI {
 
   def main(args: Array[String]) {
-
-    val nisperoRunner = new NisperoRunner(nisperoDistribution, configuration.config, configuration.metadata.credentials)
-
-    args.headOption match {
-      case Some("run")  => {
-        nisperoRunner.run()
-      }
-      case _ =>  nisperoRunner.run()
-    }
+    new NisperoRunner(nisperoDistribution, configuration.config, args.toList).run()
   }
 
   //compiler check

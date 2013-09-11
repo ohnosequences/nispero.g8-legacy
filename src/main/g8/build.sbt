@@ -4,7 +4,7 @@ import ReleasePlugin._
 import ReleaseKeys._
 import NisperoBuild._
 
-name := "$name$"
+name := "w"
 
 description := ""
 
@@ -12,7 +12,7 @@ organization := "ohnosequences"
 
 isPrivate := true
 
-//artifactsBucket := "$bucket$"
+//artifactsBucket := "frutero.org"
 
 buildInfoKeys <++= (s3credentials) {
     case s3cred => Seq[BuildInfoKey]("credentials" -> s3cred)
@@ -82,4 +82,4 @@ nextVersion := { ver => Version(ver).map(_.bumpMinor.string).getOrElse(versionFo
 
 addCommandAlias("nispero-publish", ";reload;release with-defaults") 
 
-addCommandAlias("nispero-run", ";reload;publish;run run")
+addCommandAlias("nispero-run", ";reload;publish;run")
