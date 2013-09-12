@@ -23,7 +23,7 @@ case object configuration extends Configuration {
     amiId = AMI44939930.id,
     securityGroups = List("nispero"),
     keyName = "nispero",
-    instanceProfile = Some("$instanceProfileARN$")
+    instanceProfile = Some("nispero")
 
   )
 
