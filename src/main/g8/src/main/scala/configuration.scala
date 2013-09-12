@@ -87,7 +87,7 @@ case object aws extends AWS(configuration) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object resources extends Resources(configuration, aws) {
+case object resources extends bundles.Resources(configuration, aws) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
