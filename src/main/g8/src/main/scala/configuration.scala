@@ -3,13 +3,16 @@ package $name$
 import ohnosequences.statika._
 
 import ohnosequences.nispero._
+import ohnosequences.nispero.bundles._
+import ohnosequences.nispero.bundles.console.{Console, FarmStateLogger}
 import ohnosequences.awstools.ec2.{EC2, InstanceType, InstanceSpecs}
 import ohnosequences.awstools.s3.ObjectAddress
 import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration, metadataProvider}
 import ohnosequences.nispero.distributions.AMI44939930
-import ohnosequences.nispero.manager.{WorkersAutoScalingGroup, ManagerAutoScalingGroup}
+import ohnosequences.nispero.manager.ManagerAutoScalingGroups
 
 import java.io.File
+import ohnosequences.nispero.worker.WorkersAutoScalingGroup
 
 case object configuration extends Configuration {
 
@@ -32,7 +35,7 @@ case object configuration extends Configuration {
     email = "$email$",
 
     managerConfig = ManagerConfig(
-      managerGroup = ManagerAutoScalingGroup(
+      groups = ManagerAutoScalingGroups(
         instanceSpecs = specs.copy(instanceType = InstanceType.C1Medium),
         version = version
       ),
@@ -64,7 +67,7 @@ case object configuration extends Configuration {
 
 }
 
-case object instructions extends ohnosequences.nispero.bundles.ScriptExecutor() {
+case object instructions extends ScriptExecutor() {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 
   val script =
@@ -80,27 +83,44 @@ echo "configuring"
 }
 
 
-case object aws extends ohnosequences.nispero.bundles.AWS(configuration) {
+case object aws extends AWS(configuration) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object resources extends ohnosequences.nispero.bundles.Resources(configuration, aws) {
+case object resources extends Resources(configuration, aws) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object logUploader extends ohnosequences.nispero.bundles.LogUploader(resources, aws) {
+case object logUploader extends LogUploader(resources, aws) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object worker extends Worker(configuration, instructions, resources, logUploader, aws) {
+case object worker extends Worker(instructions, resources, logUploader, aws) {
   val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object manager extends ohnosequences.nispero.bundles.Manager(configuration, resources, logUploader, worker, AMI44939930, aws) {
+case object controlQueueHandler extends ControlQueueHandler(resources, aws) {
+  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+}
+
+case object terminationDaemon extends TerminationDaemon(resources, aws) {
+  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+}
+
+case object manager extends Manager(controlQueueHandler, terminationDaemon, resources, logUploader, aws, worker, AMI44939930) {
   val metadata = metadataProvider.generateAWSMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 
-case object nisperoDistribution extends NisperoDistribution(manager, worker, AMI44939930) {
+case object farmStateLogger extends FarmStateLogger(resources, aws) {
+  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+}
+
+case object console extends Console(resources, logUploader, farmStateLogger, aws) {
+  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
+}
+
+
+case object nisperoDistribution extends NisperoDistribution(manager, console, AMI44939930) {
   val metadata = metadataProvider.generateAWSMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
 }
 

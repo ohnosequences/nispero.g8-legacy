@@ -14,7 +14,6 @@ isPrivate := true
 
 artifactsBucketsSuffix := "$bucketsSuffix$"
 
-//buildInfoKeys ++= Seq[BuildInfoKey]("credentials" -> Some("$resolver-accessKey$" -> "$resolver-secretKey$"))
 
 buildInfoObjectFormat <<= (bundlePackage, bundleObject) { (bp, bo) =>
   "object %s extends ohnosequences.statika.MetadataOf["+bp+"."+bo+".type]"
@@ -48,7 +47,7 @@ statikaPrivateResolvers <<= (artifactsBucketsSuffix) { bucket =>
 
 
 libraryDependencies ++= Seq(
-  "ohnosequences" % "nispero-abstract_2.10" % "0.1.2"
+  "ohnosequences" % "nispero-abstract_2.10" % "0.1.3-SNAPSHOT"
 )
 
 bundlePackage <<= configurationPackage
