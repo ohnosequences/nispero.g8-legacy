@@ -36,7 +36,7 @@ case object configuration extends Configuration {
 
     managerConfig = ManagerConfig(
       groups = ManagerAutoScalingGroups(
-        instanceSpecs = specs.copy(instanceType = InstanceType.C1Medium),
+        instanceSpecs = specs.copy(instanceType = InstanceType.M1Medium),
         version = version
       ),
       password = metadata.password
@@ -133,7 +133,8 @@ object nisperoCLI {
 
   //compiler check
   def test() {
-    val result = manager.installWithDeps(worker, true)
+    val result1 = manager.installWithDeps(worker, true)
+    val result2 = nisperoDistribution.installWithDeps(console, true)
   }
 }
 
