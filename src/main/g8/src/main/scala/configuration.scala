@@ -82,47 +82,25 @@ echo "configuring"
 """
 }
 
+case object aws extends AWS(configuration)
 
-case object aws extends AWS(configuration) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object resources extends bundles.Resources(configuration, aws)
 
-case object resources extends bundles.Resources(configuration, aws) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object logUploader extends LogUploader(resources, aws)
 
-case object logUploader extends LogUploader(resources, aws) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object worker extends Worker(instructions, resources, logUploader, aws)
 
-case object worker extends Worker(instructions, resources, logUploader, aws) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object controlQueueHandler extends ControlQueueHandler(resources, aws)
 
-case object controlQueueHandler extends ControlQueueHandler(resources, aws) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object terminationDaemon extends TerminationDaemon(resources, aws)
 
-case object terminationDaemon extends TerminationDaemon(resources, aws) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object manager extends Manager(controlQueueHandler, terminationDaemon, resources, logUploader, aws, worker, AMI44939930)
 
-case object manager extends Manager(controlQueueHandler, terminationDaemon, resources, logUploader, aws, worker, AMI44939930) {
-  val metadata = metadataProvider.generateAWSMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object farmStateLogger extends FarmStateLogger(resources, aws)
 
-case object farmStateLogger extends FarmStateLogger(resources, aws) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object console extends Console(resources, logUploader, farmStateLogger, aws)
 
-case object console extends Console(resources, logUploader, farmStateLogger, aws) {
-  val metadata = metadataProvider.generateMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
-
-
-case object nisperoDistribution extends NisperoDistribution(manager, console, AMI44939930) {
-  val metadata = metadataProvider.generateAWSMetadata[this.type, meta.configuration.type](this.toString, meta.configuration)
-}
+case object nisperoDistribution extends NisperoDistribution(manager, console, AMI44939930)
 
 
 object nisperoCLI {
