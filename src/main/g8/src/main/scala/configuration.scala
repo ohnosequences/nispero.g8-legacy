@@ -72,7 +72,6 @@ case object instructions extends ScriptExecutor() {
 
   val script =
 """
-cp input/input1 output/output1
 echo "success" > message
 """
 
