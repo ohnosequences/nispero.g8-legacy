@@ -35,9 +35,6 @@ publishTo <<= (isSnapshot, artifactsBucketsSuffix) {
   Some("$resolver-accessKey$" -> "$resolver-secretKey$") map s3resolver("My "+prefix+" S3 bucket", "s3://"+prefix+"." + bucket, Resolver.localBasePattern)
 }
 
-statikaVersion := "0.14.0"
-
-
 statikaPrivateResolvers <<= (artifactsBucketsSuffix) { bucket =>
   Seq(
     ("s3://private.releases." + bucket)  at s3("s3://private.releases." + bucket),
@@ -47,7 +44,7 @@ statikaPrivateResolvers <<= (artifactsBucketsSuffix) { bucket =>
 
 
 libraryDependencies ++= Seq(
-  "ohnosequences" % "nispero-abstract_2.10" % "0.1.5"
+  "ohnosequences" % "nispero-abstract_2.10" % "0.1.6-SNAPSHOT"
 )
 
 bundlePackage <<= configurationPackage

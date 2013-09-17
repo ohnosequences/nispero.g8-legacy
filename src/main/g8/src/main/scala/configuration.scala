@@ -105,7 +105,7 @@ case object nisperoDistribution extends NisperoDistribution(manager, console, AM
 object nisperoCLI {
 
   def main(args: Array[String]) {
-    new NisperoRunner(nisperoDistribution, configuration.config, args.toList).run()
+    new NisperoRunner(nisperoDistribution, configuration.config, args.toList).start()
   }
 
   //compiler check
