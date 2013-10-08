@@ -9,7 +9,7 @@ publishMavenStyle := false
 
 bucketSuffix := "$bucketsSuffix$"
 
-publishTo <<= (isSnapshot, artifactsBucketsSuffix) {
+publishTo <<= (isSnapshot, bucketSuffix) {
                 (snapshot, bucket) =>
   val prefix = "private." + (if (snapshot) "snapshots" else "releases")
   val url = "s3://" + prefix + "." + bucket
