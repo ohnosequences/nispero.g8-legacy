@@ -1,19 +1,17 @@
 package $name$
 
 import ohnosequences.statika._
-
 import ohnosequences.nispero._
 import ohnosequences.nispero.bundles._
 import ohnosequences.nispero.bundles.console.{Console, FarmStateLogger}
 import ohnosequences.awstools.ec2.{EC2, InstanceType, InstanceSpecs}
 import ohnosequences.awstools.s3.ObjectAddress
+import ohnosequences.awstools.autoscaling._
 import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration, metadataProvider}
 import ohnosequences.nispero.distributions.AMI201309
 import ohnosequences.nispero.manager.ManagerAutoScalingGroups
-import ohnosequences.awstools.autoscaling._
-
-import java.io.File
 import ohnosequences.nispero.worker.WorkersAutoScalingGroup
+import java.io.File
 
 case object configuration extends Configuration {
 
@@ -39,7 +37,7 @@ case object configuration extends Configuration {
       groups = ManagerAutoScalingGroups(
         instanceSpecs = specs.copy(instanceType = InstanceType.M1Medium),
         version = version,
-        purchaseModel = OnDemand
+        purchaseModel = SpotAuto
       ),
       password = "$password$"
     ),
