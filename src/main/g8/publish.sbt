@@ -7,7 +7,7 @@ isPrivate := true
 
 publishMavenStyle := false
 
-artifactsBucketsSuffix := "$bucketsSuffix$"
+bucketSuffix := "$bucketsSuffix$"
 
 publishTo <<= (isSnapshot, artifactsBucketsSuffix) {
                 (snapshot, bucket) =>
