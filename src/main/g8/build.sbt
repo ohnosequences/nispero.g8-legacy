@@ -5,11 +5,12 @@ description := ""
 organization := "ohnosequences"
 
 libraryDependencies ++= Seq(
-  "ohnosequences" % "nispero-abstract_2.10" % "1.0.0-RC1"
+  "ohnosequences" % "nispero-abstract_2.10" % "1.1.0"
 )
 
-bundleObjects := Seq(
-  "$name$.configuration"
+resolvers ++= Seq(
+  "Era7 maven releases"  at "http://releases.era7.com.s3.amazonaws.com",
+  "Era7 maven snapshots"  at "http://snapshots.era7.com.s3.amazonaws.com"
 )
 
-addCommandAlias("nispero-run", ";reload;publish;run")
+addCommandAlias("nispero-run", ";reload;run")

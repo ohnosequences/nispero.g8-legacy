@@ -15,8 +15,7 @@ import java.io.File
 
 case object configuration extends Configuration {
 
-  val metadata = generated.metadata.configuration
-
+  val metadata = metadataProvider.fromMap[this.type]("configuration", meta.configuration.metadata)
   //id of nispero instance
   val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "").toLowerCase
 
@@ -37,7 +36,7 @@ case object configuration extends Configuration {
       groups = ManagerAutoScalingGroups(
         instanceSpecs = specs.copy(instanceType = InstanceType.M1Medium),
         version = version,
-        purchaseModel = SpotAuto
+        purchaseModel = OnDemand
       ),
       password = "$password$"
     ),
@@ -62,10 +61,12 @@ case object configuration extends Configuration {
           deviceMapping = Map("/dev/xvdb" -> "ephemeral0")
         )
       )
-    )
+    ),
+
+    jarAddress = ObjectAddress(metadata.jarBucket, metadata.jarKey)
   )
 
-  case object ami extends OneJarAmi201309(ObjectAddress(metadata.jarBucket, metadata.jarKey))
+  case object ami extends OneJarAmi201309(config.jarAddress, config.resources.bucket)
 }
 
 case object instructions extends ScriptExecutor() {
@@ -81,7 +82,6 @@ echo "success" > message
 echo "configuring"
     """
 }
-
 
 
 case object aws extends AWS(configuration)
