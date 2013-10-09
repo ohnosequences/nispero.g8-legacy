@@ -36,7 +36,7 @@ case object configuration extends Configuration {
       groups = ManagerAutoScalingGroups(
         instanceSpecs = specs.copy(instanceType = InstanceType.M1Medium),
         version = version,
-        purchaseModel = OnDemand
+        purchaseModel = SpotAuto
       ),
       password = "$password$"
     ),
