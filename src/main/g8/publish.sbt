@@ -5,7 +5,7 @@ import ReleaseKeys._
 
 publishMavenStyle := false
 
-artifactsBucketsSuffix := ""$bucketsSuffix$"
+artifactsBucketsSuffix := "$bucketsSuffix$"
 
 artifactsBucket <<= (isSnapshot, artifactsBucketsSuffix) { (snapshot, suffix) =>
   val prefix = "private." + (if (snapshot) "snapshots" else "releases")
