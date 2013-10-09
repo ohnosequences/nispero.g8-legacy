@@ -8,7 +8,7 @@ import ohnosequences.awstools.ec2.{EC2, InstanceType, InstanceSpecs}
 import ohnosequences.awstools.s3.ObjectAddress
 import ohnosequences.awstools.autoscaling._
 import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration, metadataProvider}
-import ohnosequences.nispero.distributions.AMI201309
+import ohnosequences.nispero.distributions._
 import ohnosequences.nispero.manager.ManagerAutoScalingGroups
 import ohnosequences.nispero.worker.WorkersAutoScalingGroup
 import java.io.File
@@ -22,8 +22,8 @@ case object configuration extends Configuration {
 
   val specs = InstanceSpecs(
     instanceType = InstanceType.M1Medium,
-    amiId = AMI201309.id,
-    securityGroups = List("nispero", "ssh"),
+    amiId = OneJarAmi201309.id,
+    securityGroups = List("nispero"),
     keyName = "nispero",
     instanceProfile = Some("nispero")
 
@@ -65,6 +65,7 @@ case object configuration extends Configuration {
     )
   )
 
+  case object ami extends OneJarAmi201309(ObjectAddress(metadata.jarBucket, metadata.jarKey))
 }
 
 case object instructions extends ScriptExecutor() {
@@ -81,6 +82,8 @@ echo "configuring"
     """
 }
 
+
+
 case object aws extends AWS(configuration)
 
 case object resources extends bundles.Resources(configuration, aws)
@@ -93,22 +96,31 @@ case object controlQueueHandler extends ControlQueueHandler(resources, aws)
 
 case object terminationDaemon extends TerminationDaemon(resources, aws)
 
-case object manager extends Manager(controlQueueHandler, terminationDaemon, resources, logUploader, aws, worker, AMI201309)
+case object manager extends Manager(controlQueueHandler, terminationDaemon, resources, logUploader, aws, worker, configuration.ami)
 
 case object farmStateLogger extends FarmStateLogger(resources, aws)
 
 case object console extends Console(resources, logUploader, farmStateLogger, aws)
 
-case object nisperoDistribution extends NisperoDistribution(manager, console, AMI201309)
+case object nisperoDistribution extends NisperoDistribution(manager, console, configuration.ami)
 
 
 object nisperoCLI extends NisperoRunner(configuration.config) {
 
-  def action(args: List[String]) {runNispero(args, nisperoDistribution)}
-  //compiler check
-  def test() {
-    val result1 = manager.installWithDeps(worker, true)
-    val result2 = nisperoDistribution.installWithDeps(console, true)
+  def runNispero(args: List[String]) {
+    runNispero(args, nisperoDistribution)
+  }
+
+  def installWorker() {
+    manager.installWithDeps(worker, true)
+  }
+
+  def installConsole() {
+    nisperoDistribution.installWithDeps(console, true)
+  }
+
+  def installManager() {
+    nisperoDistribution.installWithDeps(manager, true)
   }
 }
 
