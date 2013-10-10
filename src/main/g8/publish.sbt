@@ -67,18 +67,10 @@ buildInfoKeys <<= (name, organization, version, scalaBinaryVersion, artifactsBuc
     )
 }
 
-//buildInfoPrefix := ""
-
-//buildInfoObjectFormat <<= (name) {
-//  (name) =>  "case object %s extends ohnosequences.statika.MetadataOf[" + name + ".configuration]"
-//}
-
-
 buildInfoPackage <<= (name) {
   (name) => name + ".meta"
 }
 
 buildInfoObject :=  "configuration"
 
-//buildInfoSuffix := ""
 
