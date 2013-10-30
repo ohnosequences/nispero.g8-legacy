@@ -11,4 +11,4 @@ project/plugins/project/
 artifacts/
 
 # credentials
-publish.sbt
+credentials.sbt

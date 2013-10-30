@@ -12,10 +12,10 @@ artifactsBucket <<= (isSnapshot, artifactsBucketsSuffix) { (snapshot, suffix) =>
   prefix + "." + suffix
 }
 
-publishTo <<= (isSnapshot, artifactsBucket) {
-                (snapshot, bucket) =>
+publishTo <<= (isSnapshot, artifactsBucket, s3credentials) {
+                (snapshot, bucket, cred) =>
   val url = "s3://" + bucket
-  Some("$resolver-accessKey$" -> "$resolver-secretKey$") map S3Resolver(url, url, Resolver.ivyStylePatterns).toSbtResolver
+  cred map S3Resolver(url, url, Resolver.ivyStylePatterns).toSbtResolver
 }
 
 seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
@@ -57,7 +57,7 @@ buildInfoKeys <<= (name, organization, version, scalaBinaryVersion, artifactsBuc
     Seq[BuildInfoKey](
       "metadata" -> Map(
         "organization" -> organization,
-        "name" -> (name + ".configuration"),  //fix it!
+        "name" -> (name + ".configuration"),
         "artifact" -> name,
         "version" -> version,
         "statikaVersion" -> "0.15.0",
