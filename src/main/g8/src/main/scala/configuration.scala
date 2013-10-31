@@ -17,7 +17,7 @@ case object configuration extends Configuration {
 
   val metadata = metadataProvider.fromMap[this.type]("configuration", meta.configuration.metadata)
   //id of nispero instance
-  val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "").toLowerCase
+  val version = (metadata.name + metadata.version).replace(".", "").replace(this.toString, "")
 
   val specs = InstanceSpecs(
     instanceType = InstanceType.M1Medium,

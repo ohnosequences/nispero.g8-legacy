@@ -37,7 +37,7 @@ releaseProcess <<= thisProjectRef apply { ref =>
   )
 }
 
-nextVersion := { ver => Version(ver).map(_.bumpMinor.string).getOrElse(versionFormatError) }
+nextVersion := { ver => sbtrelease.Version(ver).map(_.bumpMinor.string).getOrElse(versionFormatError) }
 
 addCommandAlias("nispero-publish", ";reload;release with-defaults")
 
