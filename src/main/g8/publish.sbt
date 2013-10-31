@@ -50,8 +50,8 @@ buildInfoKeys <<= (name, organization, version, scalaBinaryVersion, artifactsBuc
     //ivy pattern
     val pattern = "[organization]/[name]_[scalaBinaryVersion]/[version]/jars/[name]_[scalaBinaryVersion]-one.jar"
     val key =  pattern
-      .replace("[organization]", organization)
-      .replace("[name]", name)
+      .replace("[organization]", organization.toLowerCase())
+      .replace("[name]", name.toLowerCase())
       .replace("[version]", version)
       .replace("[scalaBinaryVersion]", scalaBinaryVersion)
     Seq[BuildInfoKey](
