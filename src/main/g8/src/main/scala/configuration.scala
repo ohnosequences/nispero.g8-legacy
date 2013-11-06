@@ -72,12 +72,12 @@ case object configuration extends Configuration {
 case object instructions extends ScriptExecutor() {
   val metadata = metadataProvider.generateMetadata[this.type, configuration.metadata.type](this.toString, configuration.metadata)
 
-  val script =
+  val instructionsScript =
     """
 echo "success" > message
     """
 
-  val configure =
+  val configureScript =
     """
 echo "configuring"
     """
