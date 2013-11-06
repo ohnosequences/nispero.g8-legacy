@@ -5,7 +5,7 @@ description := ""
 organization := "ohnosequences"
 
 libraryDependencies ++= Seq(
-  "ohnosequences" % "nispero-abstract_2.10" % "1.4.0-SNAPSHOT"
+  "ohnosequences" % "nispero-abstract_2.10" % "1.4.0"
 )
 
 resolvers ++= Seq(
