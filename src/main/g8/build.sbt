@@ -1,16 +1,24 @@
+import AssemblyKeys._
+
+Statika.distributionProject
+
 name := "$name$"
 
 description := ""
 
-organization := "ohnosequences"
+organization := "$organization$"
 
 libraryDependencies ++= Seq(
-  "ohnosequences" % "nispero-abstract_2.10" % "1.4.0"
+  "ohnosequences" % "nispero-abstract_2.10" % "1.5.0"
 )
 
-resolvers ++= Seq(
-  "Era7 maven releases"  at "http://releases.era7.com.s3.amazonaws.com",
-  "Era7 maven snapshots"  at "http://snapshots.era7.com.s3.amazonaws.com"
-)
+metadataObject := name.value
 
 addCommandAlias("nispero-run", ";reload;run")
+
+mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
+  {
+    case "about.html" => MergeStrategy.first
+    case x => old(x)
+  }
+}
