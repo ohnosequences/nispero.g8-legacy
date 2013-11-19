@@ -12,9 +12,12 @@ import ohnosequences.nispero.bundles.{NisperoDistribution, Worker, Configuration
 import ohnosequences.nispero.manager.ManagerAutoScalingGroups
 import ohnosequences.nispero.worker.WorkersAutoScalingGroup
 import java.io.File
+import ohnosequences.typesets._
+import shapeless._
 
 case object configuration extends Configuration {
 
+  type Metadata = generated.metadata.$name$
   val metadata = new generated.metadata.$name$()  
   val version = generateId(metadata)
   

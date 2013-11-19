@@ -9,7 +9,7 @@ description := ""
 organization := "$organization$"
 
 libraryDependencies ++= Seq(
-  "ohnosequences" % "nispero-abstract_2.10" % "1.5.0"
+  "ohnosequences" % "nispero-abstract_2.10" % "1.0.0"
 )
 
 metadataObject := name.value
